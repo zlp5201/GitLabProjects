@@ -1,6 +1,7 @@
 package com.ppolivka.gitlabprojects.merge.list;
 
 import com.intellij.notification.NotificationListener;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -9,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.configuration.ProjectState;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
+import com.ppolivka.gitlabprojects.dto.GitlabServer;
 import com.ppolivka.gitlabprojects.exception.MergeRequestException;
 import com.ppolivka.gitlabprojects.merge.GitLabDiffViewWorker;
 import com.ppolivka.gitlabprojects.merge.GitLabMergeRequestWorker;
@@ -20,6 +22,7 @@ import org.gitlab.api.models.GitlabProject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -56,12 +59,31 @@ public class GitLabMergeRequestListWorker implements GitLabMergeRequestWorker {
                     settingsState.api(gitRepository).acceptMergeRequest(gitlabProject, mergeRequest);
                     VcsNotifier.getInstance(project)
                             .notifyImportantInfo("Merged", "Merge request is merged.", NotificationListener.URL_OPENING_LISTENER);
+
+                    String mergeurl = generateMergeRequestUrl(settingsState.currentGitlabServer(gitRepository), mergeRequest);
+
+                    CopyPasteManager.getInstance().setContents(new StringSelection(mergeurl + "\t done!"));
+
                 } catch (IOException e) {
-                    showErrorDialog(project, "Cannot create merge this request", "Cannot Merge");
+                    showErrorDialog(project, "Cannot accept merge this request:" + e.getMessage(), "Cannot Merge");
                 }
             }
         }.queue();
     }
+
+    private String generateMergeRequestUrl(GitlabServer server, GitlabMergeRequest mergeRequest) {
+        final String hostText = server.getApiUrl();
+        StringBuilder helpUrl = new StringBuilder();
+        helpUrl.append(hostText);
+        if (!hostText.endsWith("/")) {
+            helpUrl.append("/");
+        }
+        helpUrl.append(gitlabProject.getPathWithNamespace());
+        helpUrl.append("/merge_requests/");
+        helpUrl.append(mergeRequest.getIid());
+        return helpUrl.toString();
+    }
+
 
 
     public static GitLabMergeRequestListWorker create(@NotNull final Project project, @Nullable final VirtualFile file) {

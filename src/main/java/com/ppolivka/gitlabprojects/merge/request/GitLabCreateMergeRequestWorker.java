@@ -1,6 +1,8 @@
 package com.ppolivka.gitlabprojects.merge.request;
 
+import com.intellij.designer.clipboard.SimpleTransferable;
 import com.intellij.notification.NotificationListener;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -30,6 +32,7 @@ import org.gitlab.api.models.GitlabUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,11 +93,19 @@ public class GitLabCreateMergeRequestWorker implements GitLabMergeRequestWorker 
                 try {
                     mergeRequest = settingsState.api(gitRepository).createMergeRequest(gitlabProject, assignee, gitLocalBranch.getName(), branch.getName(), title, description, removeSourceBranch);
                 } catch (IOException e) {
-                    showErrorDialog(project, "Cannot create Merge Request via GitLab REST API", CANNOT_CREATE_MERGE_REQUEST);
+                    showErrorDialog(project, "Cannot create Merge Request: " + e.getMessage(), CANNOT_CREATE_MERGE_REQUEST);
                     return;
                 }
+
+
+                String mergeurl = generateMergeRequestUrl(settingsState.currentGitlabServer(gitRepository), mergeRequest);
+
                 VcsNotifier.getInstance(project)
-                        .notifyImportantInfo(title, "<a href='" + generateMergeRequestUrl(settingsState.currentGitlabServer(gitRepository), mergeRequest) + "'>Merge request '" + title + "' created</a>", NotificationListener.URL_OPENING_LISTENER);
+                        .notifyImportantInfo(title, "<a href='" + mergeurl + "'>Merge request '" + title + "' created</a>", NotificationListener.URL_OPENING_LISTENER);
+
+                // add to ClipBoard
+                CopyPasteManager.getInstance().setContents(new StringSelection(mergeurl + "\nSource branch:" + gitLocalBranch.getName() + "\nTarget branch: " + branch.getName() + "\nAuthor:" + mergeRequest.getAuthor().getName()));
+
             }
         }.queue();
     }

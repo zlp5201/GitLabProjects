@@ -33,7 +33,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
     private JButton diffButton;
     private JComboBox assigneeBox;
     private JCheckBox removeSourceBranch;
-    private JCheckBox wip;
+    private JCheckBox WIP;
 
     private SortedComboBoxModel<BranchInfo> myBranchModel;
     private BranchInfo lastSelectedBranch;
@@ -91,7 +91,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
 
         Boolean mergeAsWorkInProgress = projectState.getMergeAsWorkInProgress();
         if(mergeAsWorkInProgress != null && mergeAsWorkInProgress) {
-            this.wip.setSelected(true);
+            this.WIP.setSelected(true);
         }
 
         diffButton.addActionListener(e -> mergeRequestWorker.getDiffViewWorker().showDiffDialog(mergeRequestWorker.getLocalBranchInfo(), getSelectedBranch()));
@@ -102,7 +102,7 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         BranchInfo branch = getSelectedBranch();
         if (mergeRequestWorker.checkAction(branch)) {
             String title = mergeTitle.getText();
-            if(wip.isSelected()) {
+            if(WIP.isSelected()) {
                 title = "WIP:"+title;
             }
             mergeRequestWorker.createMergeRequest(branch, getAssignee(), title, mergeDescription.getText(), removeSourceBranch.isSelected());
@@ -118,6 +118,11 @@ public class CreateMergeRequestDialog extends DialogWrapper {
         }
         if (getSelectedBranch().getName().equals(currentBranch.getText())) {
             return new ValidationInfo("Target branch must be different from current branch.", targetBranch);
+        }
+
+        // description is required
+        if (StringUtils.isBlank(mergeDescription.getText())) {
+            return new ValidationInfo("Description cannot be empty", mergeDescription);
         }
         return null;
     }

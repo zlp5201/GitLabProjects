@@ -1,5 +1,8 @@
 package com.ppolivka.gitlabprojects.api;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.ppolivka.gitlabprojects.api.dto.NamespaceDto;
 import org.gitlab.api.AuthMethod;
 import org.gitlab.api.GitlabAPI;
@@ -7,6 +10,7 @@ import org.gitlab.api.TokenType;
 import org.gitlab.api.http.GitlabHTTPRequestor;
 import org.gitlab.api.models.*;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -149,6 +153,48 @@ public class ApiFacade {
         }
         return users;
     }
+
+
+    /**
+     * find master and owner
+     * @param project
+     * @param text
+     * @return
+     * @throws IOException
+     */
+    public Collection<GitlabProjectMember> searchMasterMembers(GitlabProject project, String text) throws IOException {
+        checkApi();
+        List<GitlabProjectMember> users = new ArrayList<>();
+        List<GitlabProjectMember> masterMember = Lists.newArrayList();
+        if (text != null) {
+            String tailUrl = GitlabProject.URL + "/" + project.getId() + GitlabProjectMember.URL + "?search=" + URLEncoder.encode(text, "UTF-8");
+            tailUrl += "&per_page=100";
+            GitlabProjectMember[] response = api.retrieve().to(tailUrl, GitlabProjectMember[].class);
+            users = Arrays.asList(response);
+
+
+            for (GitlabProjectMember member: users) {
+                if (member.getAccessLevel().accessValue >= GitlabAccessLevel.Master.accessValue) {
+
+                    masterMember.add(member);
+                }
+            }
+        }
+        return masterMember;
+    }
+
+
+
+    public Object createBranch(GitlabProject project, String featureBranch, String baseBranch) throws IOException {
+        String tailUrl = "/projects/" + project.getId() + GitlabBranch.URL;
+        GitlabHTTPRequestor requestor = api.dispatch()
+                .with("branch", featureBranch)
+                .with("ref", baseBranch);
+
+        return requestor.to(tailUrl, null);
+    }
+
+
 
     public GitlabUser getCurrentUser() throws IOException {
         checkApi();

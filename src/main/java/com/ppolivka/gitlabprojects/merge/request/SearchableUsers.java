@@ -39,7 +39,9 @@ public class SearchableUsers implements Searchable<SearchableUser, String> {
     @Override
     public Collection<SearchableUser> search(String toSearch) {
         try {
-            List<SearchableUser> users = settingsState.api(project, file).searchUsers(gitlabProject, toSearch).stream().map(SearchableUser::new).collect(Collectors.toList());
+            // TODO
+//            List<SearchableUser> users = settingsState.api(project, file).searchUsers(gitlabProject, toSearch).stream().map(SearchableUser::new).collect(Collectors.toList());
+            List<SearchableUser> users = settingsState.api(project, file).searchMasterMembers(gitlabProject, toSearch).stream().map(SearchableUser::new).collect(Collectors.toList());
             List<SearchableUser> resultingUsers = new ArrayList<>();
             resultingUsers.addAll(users);
             return resultingUsers;

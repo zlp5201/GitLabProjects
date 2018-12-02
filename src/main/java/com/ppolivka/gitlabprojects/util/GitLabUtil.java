@@ -16,6 +16,7 @@ import com.intellij.util.containers.Convertor;
 import com.ppolivka.gitlabprojects.configuration.SettingsState;
 import git4idea.GitUtil;
 import git4idea.commands.GitCommand;
+import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitSimpleHandler;
 import git4idea.config.GitVcsApplicationSettings;
 import git4idea.config.GitVersion;
@@ -260,6 +261,27 @@ public class GitLabUtil {
     @Messages.YesNoResult
     public static boolean showYesNoDialog(@Nullable Project project, @NotNull String title, @NotNull String message) {
         return Messages.YES == Messages.showYesNoDialog(project, message, title, Messages.getQuestionIcon());
+    }
+
+    public static GitCommandResult createFeatureBranch(@NotNull Project project, @NotNull String baseBranchName, @NotNull String featureName) {
+//        GitflowErrorsListener errorListener = new GitflowErrorsListener(myProject);
+//
+//        GitRepositoryManager manager = GitUtil.getRepositoryManager(project);
+//
+//
+//        GitBranchWorker gitBranchWorker = new GitBranchWorker(project, );
+//        GitCommandResult result = GitBranchWorker.startFeature(project, featureName, baseBranchName, errorListener);
+//
+//        manager.
+
+//        if (result.success()) {
+//            String startedFeatureMessage = String.format("A new branch '%s%s' was created, based on '%s'", featurePrefix, featureName, baseBranchName);
+//            NotifyUtil.notifySuccess(myProject, featureName, startedFeatureMessage);
+//        } else {
+//            NotifyUtil.notifyError(myProject, "Error", "Please have a look at the Version Control console for more details");
+//        }
+
+        return null;
     }
 
 }

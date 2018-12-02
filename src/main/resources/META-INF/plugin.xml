@@ -61,15 +61,21 @@
     </project-components>
 
     <actions>
+
+        <action id="ymm_git" class="com.ppolivka.gitlabprojects.common.OpenGitLabAction" text="Ymm Code" description="this is short key for code" icon="/icons/gitLabSmall.png">
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+        </action>
+
         <action id="Gitlab.Share" class="com.ppolivka.gitlabprojects.share.GitLabShareAction">
             <add-to-group group-id="Vcs.Import"/>
         </action>
         <group id="GitLabGroup" text="Git _Lab" popup="true" icon="/icons/gitLabSmall.png">
             <action id="Gitlab.Create.Merge.Request" class="com.ppolivka.gitlabprojects.merge.request.GitLabMergeRequestAction"/>
             <action id="Gitlab.Create.Merge.Request.List" class="com.ppolivka.gitlabprojects.merge.list.GitLabMergeRequestListAction"/>
+            <action id="Gitlab.Create.MergeBranch" class="com.ppolivka.gitlabprojects.branch.StartMergeBranchAction"/>
 
-            <add-to-group group-id="Git.Menu"/>
-            <add-to-group group-id="Git.ContextMenu"/>
+            <add-to-group group-id="Git.Menu" anchor="first"/>
+            <add-to-group group-id="Git.ContextMenu" anchor="first"/>
         </group>
     </actions>
 
